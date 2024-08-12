@@ -1,0 +1,10 @@
+name = \"LibreIMG\"
+type = \"javascript\"
+account_id = \"your-cloudflare-account-id\"
+workers_dev = true
+
+[env.production]
+account_id = \"your-production-account-id\"
+workers_dev = false
+route = \"your-domain.com/*\"
+zone_id = \"your-zone-id\"
