@@ -1,4 +1,5 @@
 body {
+    font-family: Arial, sans-serif;
     background-color: #000;
     color: #fff;
     margin: 0;
@@ -14,14 +15,62 @@ body {
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
-.result-item {
-    margin-top: 20px;
+h1 {
+    color: #007bff;
+    text-align: center;
 }
 
-.result-item label {
-    margin-bottom: 5px;
-}
-
-.result-item input {
+label {
+    display: block;
     margin-bottom: 10px;
+}
+
+.drop-area {
+    border: 2px dashed #007bff;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.drop-area:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+input[type="file"] {
+    display: none; /* 隐藏文件输入框 */
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+progress {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.result {
+    margin-top: 20px;
+    color: #ccc;
+}
+
+.result p {
+    margin: 5px 0;
+}
+
+.result img {
+    max-width: 100%;
+    margin-top: 10px;
 }

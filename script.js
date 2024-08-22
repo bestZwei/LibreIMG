@@ -1,62 +1,72 @@
-document.getElementById('uploadForm').onsubmit = function(event) {
-    event.preventDefault(); // 防止默认表单提交
-
-    const formData = new FormData(this);
-    const progressBar = document.querySelector('.progress');
-    const progressBarElement = document.querySelector('.progress-bar');
-    progressBar.classList.remove('hidden');
-    progressBarElement.style.width = '0%';
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://telegra.ph/upload', true);
+document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
     
-    xhr.upload.onprogress = function(event) {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            progressBarElement.style.width = percentComplete + '%';
+    const fileInput = document.getElementById('fileInput');
+    const files = fileInput.files;
+    const progress = document.getElementById('uploadProgress');
+    const resultDiv = document.getElementById('result');
+
+    if (files.length === 0) return;
+
+    const formData = new FormData();
+    for (const file of files) {
+        formData.append('file0', file);
+    }
+
+    progress.style.display = 'block';
+
+    try {
+        const response = await fetch('https://telegra.ph/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('上传失败，请重试。');
         }
-    };
 
-    xhr.onload = function() {
-        progressBar.classList.add('hidden');
-        if (xhr.status >= 200 && xhr.status < 300) {
-            const response = xhr.responseText;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(response, 'text/html');
-            const filePath = doc.querySelector('img').src; // 获取上传后的图片链接
+        const data = await response.json();
+        const originalUrl = `https://telegra.ph/file/${data[0].path}`; // Telegra.ph 原链接
+        const proxyUrl = `https://example.com/file/${data[0].path.split('/').pop()}`; // 代理链接
+        const markdownLink = `![${files[0].name}](${proxyUrl})`; // Markdown 格式链接
+        const htmlLink = `<img src="${proxyUrl}" />`; // HTML 格式插入链接
 
-            displayLinks(filePath);
-        } else {
-            alert('上传失败，请重试。');
-        }
-    };
+        resultDiv.innerHTML = `
+            <p>原链接: <a href="${originalUrl}" target="_blank">${originalUrl}</a></p>
+            <p>代理链接: <a href="${proxyUrl}" target="_blank">${proxyUrl}</a></p>
+            <p>Markdown 格式链接: <code>${markdownLink}</code></p>
+            <p>HTML 格式插入链接: <code>${htmlLink}</code></p>
+            <img src="${originalUrl}" alt="Uploaded Image" />
+        `;
 
-    xhr.onerror = function() {
-        progressBar.classList.add('hidden');
-        alert('网络错误，请检查您的连接。');
-    };
+        // 自动复制链接到剪贴板
+        navigator.clipboard.writeText(proxyUrl).then(() => {
+            console.log('代理链接已复制到剪贴板');
+        });
+    } catch (error) {
+        resultDiv.innerHTML = `<p>${error.message}</p>`;
+    } finally {
+        progress.style.display = 'none';
+    }
+});
 
-    xhr.send(formData);
-};
+// 拖拽上传功能
+const dropArea = document.getElementById('dropArea');
 
-function displayLinks(filePath) {
-    const originDomain = window.location.origin;
-    const proxyUrl = `${originDomain}${filePath}`;
-    const markdownLink = `![Image](${filePath})`;
-    const htmlLink = `<img src="${filePath}" alt="Image">`;
+dropArea.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    dropArea.classList.add('hover');
+});
 
-    const resultHtml = `
-        <div class="result-item">
-            <label>原始链接:</label>
-            <input type="text" value="${filePath}" readonly class="w-full p-2 border border-gray-300 rounded mb-2">
-            <label>代理链接:</label>
-            <input type="text" value="${proxyUrl}" readonly class="w-full p-2 border border-gray-300 rounded mb-2">
-            <label>Markdown 格式:</label>
-            <input type="text" value="${markdownLink}" readonly class="w-full p-2 border border-gray-300 rounded mb-2">
-            <label>HTML 格式:</label>
-            <input type="text" value="${htmlLink}" readonly class="w-full p-2 border border-gray-300 rounded mb-2">
-        </div>
-    `;
+dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('hover');
+});
 
-    document.getElementById('result').innerHTML = resultHtml;
-}
+dropArea.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropArea.classList.remove('hover');
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files; // 将拖拽的文件赋值给文件输入框
+    }
+});
