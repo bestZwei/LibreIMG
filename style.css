@@ -1,9 +1,4 @@
 .upload-container {
-    border: 2px dashed #007bff;
-    border-radius: 5px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
     transition: background-color 0.3s;
 }
 

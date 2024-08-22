@@ -40,13 +40,8 @@ async function uploadImage() {
             body: formData,
         });
 
-        progressBar.style.width = '75%';
-
         if (!response.ok) {
-            alert('上传失败');
-            progressBar.style.width = '0%';
-            document.querySelector('.progress').style.display = 'none';
-            return;
+            throw new Error('上传失败');
         }
 
         const result = await response.json();
@@ -74,7 +69,6 @@ async function uploadImage() {
     } catch (error) {
         alert('上传过程中发生错误: ' + error.message);
     } finally {
-        // 重置进度条
         progressBar.style.width = '0%';
         document.querySelector('.progress').style.display = 'none';
         input.value = ''; // 清除文件输入
