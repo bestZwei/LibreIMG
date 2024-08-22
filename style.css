@@ -18,10 +18,10 @@ body {
     margin-top: 20px;
 }
 
-.result-item p {
-    margin-bottom: 10px;
+.result-item label {
+    margin-bottom: 5px;
 }
 
-button {
-    margin-left: 10px;
+.result-item input {
+    margin-bottom: 10px;
 }
