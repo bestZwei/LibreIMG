@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegraph 图床</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">上传图片到 Telegraph</h1>
+        <div id="uploadContainer" class="upload-container mt-4">
+            <p>拖拽文件到此处或点击选择文件上传</p>
+            <input type="file" id="fileInput" class="d-none" multiple>
+        </div>
+        <button class="btn btn-primary mt-3" onclick="uploadImage()">上传</button>
+        <div class="progress mt-3">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div id="result" class="mt-4"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
