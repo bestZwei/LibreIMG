@@ -119,7 +119,7 @@ async function uploadImages() {
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
-                    const filePath = response.src; // 获取文件路径
+                    const filePath = response[0].src; // 获取文件路径
                     const originalLink = `https://telegra.ph${filePath}`;
                     const proxyLink = `https://example.com${filePath}`; // 代理链接
                     const markdownLink = `![Image](${proxyLink})`;
