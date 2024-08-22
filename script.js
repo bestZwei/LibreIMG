@@ -15,7 +15,30 @@ document.getElementById('uploadContainer').addEventListener('drop', (event) => {
     event.preventDefault();
     document.getElementById('uploadContainer').classList.remove('bg-gray-700');
     document.getElementById('fileInput').files = event.dataTransfer.files;
+    displayFileInfo();
 });
+
+document.getElementById('fileInput').addEventListener('change', () => {
+    displayFileInfo();
+});
+
+function displayFileInfo() {
+    const input = document.getElementById('fileInput');
+    const files = input.files;
+    if (files.length > 0) {
+        const fileInfo = document.getElementById('fileInfo');
+        fileInfo.classList.remove('hidden');
+        fileInfo.textContent = '选择成功！';
+
+        const previewImage = document.getElementById('previewImage');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            document.getElementById('imagePreview').classList.remove('hidden');
+        }
+        reader.readAsDataURL(files[0]); // 只显示第一个文件的预览
+    }
+}
 
 async function uploadImage() {
     const input = document.getElementById('fileInput');
