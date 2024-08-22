@@ -32,41 +32,53 @@ async function uploadImage() {
 
     const progressBar = document.querySelector('.progress-bar');
     document.querySelector('.progress').style.display = 'block';
+    progressBar.style.width = '50%';
 
-    const response = await fetch('https://telegra.ph/upload', {
-        method: 'POST',
-        body: formData,
-    });
+    try {
+        const response = await fetch('https://telegra.ph/upload', {
+            method: 'POST',
+            body: formData,
+        });
 
-    if (!response.ok) {
-        alert('上传失败');
-        return;
+        progressBar.style.width = '75%';
+
+        if (!response.ok) {
+            alert('上传失败');
+            progressBar.style.width = '0%';
+            document.querySelector('.progress').style.display = 'none';
+            return;
+        }
+
+        const result = await response.json();
+        progressBar.style.width = '100%';
+
+        let resultHtml = '';
+        result.forEach(item => {
+            const filePath = item.src;
+            const originDomain = window.location.origin;
+            const proxyUrl = `${originDomain}${filePath}`;
+            const markdownLink = `![Image](https://telegra.ph${filePath})`;
+            const htmlLink = `<img src="https://telegra.ph${filePath}" alt="Image">`;
+
+            resultHtml += `
+                <div class="result-item">
+                    <p>原始链接: <a href="https://telegra.ph${filePath}" target="_blank">https://telegra.ph${filePath}</a></p>
+                    <p>代理链接: <a href="${proxyUrl}" target="_blank">${proxyUrl}</a></p>
+                    <p>Markdown 格式: <code>${markdownLink}</code> <button onclick="copyToClipboard('${markdownLink}')">复制</button></p>
+                    <p>HTML 格式: <code>${htmlLink}</code> <button onclick="copyToClipboard('${htmlLink}')">复制</button></p>
+                </div>
+            `;
+        });
+
+        document.getElementById('result').innerHTML = resultHtml;
+    } catch (error) {
+        alert('上传过程中发生错误: ' + error.message);
+    } finally {
+        // 重置进度条
+        progressBar.style.width = '0%';
+        document.querySelector('.progress').style.display = 'none';
+        input.value = ''; // 清除文件输入
     }
-
-    const result = await response.json();
-    let resultHtml = '';
-    result.forEach(item => {
-        const filePath = item.src;
-        const originDomain = window.location.origin;
-        const proxyUrl = `${originDomain}${filePath}`;
-        const markdownLink = `![Image](https://telegra.ph${filePath})`;
-        const htmlLink = `<img src="https://telegra.ph${filePath}" alt="Image">`;
-
-        resultHtml += `
-            <div class="result-item">
-                <p>原始链接: <a href="https://telegra.ph${filePath}" target="_blank">https://telegra.ph${filePath}</a></p>
-                <p>代理链接: <a href="${proxyUrl}" target="_blank">${proxyUrl}</a></p>
-                <p>Markdown 格式: <code>${markdownLink}</code> <button onclick="copyToClipboard('${markdownLink}')">复制</button></p>
-                <p>HTML 格式: <code>${htmlLink}</code> <button onclick="copyToClipboard('${htmlLink}')">复制</button></p>
-            </div>
-        `;
-    });
-
-    document.getElementById('result').innerHTML = resultHtml;
-
-    // 重置进度条
-    progressBar.style.width = '0%';
-    input.value = ''; // 清除文件输入
 }
 
 function copyToClipboard(text) {
