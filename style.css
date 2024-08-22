@@ -1,14 +1,17 @@
-.upload-container {
-    transition: background-color 0.3s;
+body {
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+    padding: 0;
 }
 
-.upload-container.dragover {
-    background-color: #e9ecef;
-}
-
-.progress {
-    display: none;
-    margin-top: 10px;
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #222;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
 .result-item {
