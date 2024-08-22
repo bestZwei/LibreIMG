@@ -34,7 +34,7 @@ function displayFileInfo() {
         const reader = new FileReader();
         reader.onload = function(e) {
             previewImage.src = e.target.result;
-            document.getElementById('imagePreview').classList.remove('hidden');
+            document.getElementById('imagePreviewArea').classList.remove('hidden');
         }
         reader.readAsDataURL(files[0]); // 只显示第一个文件的预览
     }
@@ -78,10 +78,10 @@ async function uploadImage() {
             const markdownLink = `![Image](${proxyLink})`;
             const htmlLink = `<img src="${proxyLink}" alt="Uploaded Image">`;
 
-            document.getElementById('original-link').textContent = originalLink;
-            document.getElementById('proxy-link').textContent = proxyLink;
-            document.getElementById('markdown-link').textContent = markdownLink;
-            document.getElementById('html-link').textContent = htmlLink;
+            document.getElementById('original-link').value = originalLink;
+            document.getElementById('proxy-link').value = proxyLink;
+            document.getElementById('markdown-link').value = markdownLink;
+            document.getElementById('html-link').value = htmlLink;
 
             resultDiv.classList.remove('hidden');
         } else {
