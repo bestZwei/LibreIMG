@@ -52,15 +52,22 @@ function displayFileInfo() {
     }
 }
 
-document.getElementById('uploadForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // 防止默认提交
-    const formData = new FormData(this);
+document.getElementById('uploadButton').addEventListener('click', function() {
+    const formData = new FormData();
+    const files = document.getElementById('fileInput').files;
+
+    for (let i = 0; i < files.length; i++) {
+        formData.append(`file${i}`, files[i]);
+    }
+
     const progressBar = document.querySelector('.progress-bar');
     const progressContainer = document.querySelector('.progress');
     const resultDiv = document.getElementById('result');
+    const linksDiv = document.getElementById('links');
 
     progressContainer.classList.remove('hidden');
     resultDiv.classList.add('hidden');
+    linksDiv.innerHTML = ''; // 清空之前的链接
     progressBar.style.width = '0%';
 
     const xhr = new XMLHttpRequest();
@@ -82,10 +89,12 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
             const markdownLink = `![Image](${proxyLink})`;
             const htmlLink = `<img src="${proxyLink}" alt="Uploaded Image">`;
 
-            document.getElementById('original-link').textContent = originalLink;
-            document.getElementById('proxy-link').textContent = proxyLink;
-            document.getElementById('markdown-link').textContent = markdownLink;
-            document.getElementById('html-link').textContent = htmlLink;
+            linksDiv.innerHTML += `
+                <p>原链接: <a href="${originalLink}" target="_blank">${originalLink}</a></p>
+                <p>代理链接: <a href="${proxyLink}" target="_blank">${proxyLink}</a></p>
+                <p>Markdown: ${markdownLink}</p>
+                <p>HTML: ${htmlLink}</p>
+            `;
 
             resultDiv.classList.remove('hidden');
         } else {
