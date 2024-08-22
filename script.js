@@ -1,72 +1,72 @@
-document.getElementById('uploadForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-    const progress = document.getElementById('uploadProgress');
-    const resultDiv = document.getElementById('result');
+document.getElementById('uploadContainer').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+});
 
-    if (!file) return;
+document.getElementById('uploadContainer').addEventListener('dragover', (event) => {
+    event.preventDefault();
+    document.getElementById('uploadContainer').classList.add('bg-gray-700');
+});
+
+document.getElementById('uploadContainer').addEventListener('dragleave', () => {
+    document.getElementById('uploadContainer').classList.remove('bg-gray-700');
+});
+
+document.getElementById('uploadContainer').addEventListener('drop', (event) => {
+    event.preventDefault();
+    document.getElementById('uploadContainer').classList.remove('bg-gray-700');
+    document.getElementById('fileInput').files = event.dataTransfer.files;
+});
+
+async function uploadImage() {
+    const input = document.getElementById('fileInput');
+    const files = input.files;
+    if (files.length === 0) {
+        alert('请选择一个文件');
+        return;
+    }
 
     const formData = new FormData();
-    formData.append('file0', file);
+    formData.append('file', files[0]); // 只上传第一个文件
 
-    progress.style.display = 'block';
+    const progressBar = document.querySelector('.progress-bar');
+    const progressContainer = document.querySelector('.progress');
+    const resultDiv = document.getElementById('result');
 
-    try {
-        const response = await fetch('https://telegra.ph/upload', {
-            method: 'POST',
-            body: formData
-        });
+    progressContainer.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    progressBar.style.width = '0%';
 
-        if (!response.ok) {
-            throw new Error('上传失败，请重试。');
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://telegra.ph/upload', true);
+
+    xhr.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            progressBar.style.width = percentComplete + '%';
         }
-
-        const data = await response.json();
-        const originalUrl = `https://telegra.ph/file/${data[0].path}`;
-        const proxyUrl = `https://example.com/file/${data[0].path.split('/').pop()}`;
-        const markdownLink = `![${file.name}](${proxyUrl})`;
-        const htmlLink = `<img src="${proxyUrl}" />`;
-
-        resultDiv.innerHTML = `
-            <p>原链接: <a href="${originalUrl}" target="_blank">${originalUrl}</a></p>
-            <p>代理链接: <a href="${proxyUrl}" target="_blank">${proxyUrl}</a></p>
-            <p>Markdown 格式链接: <code>${markdownLink}</code> <button class="copy-button" onclick="copyToClipboard('${markdownLink}')">复制</button></p>
-            <p>HTML 格式插入链接: <code>${htmlLink}</code> <button class="copy-button" onclick="copyToClipboard('${htmlLink}')">复制</button></p>
-        `;
-    } catch (error) {
-        resultDiv.innerHTML = `<p>${error.message}</p>`;
-    } finally {
-        progress.style.display = 'none';
-    }
-});
-
-// 拖拽上传功能
-const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    dropZone.classList.add('hover');
-});
-
-dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('hover');
-});
-
-dropZone.addEventListener('drop', (event) => {
-    event.preventDefault();
-    dropZone.classList.remove('hover');
-    const files = event.dataTransfer.files;
-    if (files.length > 0) {
-        fileInput.files = files; // 设置文件输入的文件
-    }
-});
-
-// 复制到剪贴板
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('链接已复制到剪贴板！');
-    }).catch(err => {
-        console.error('复制失败', err);
     });
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            const filePath = response.src; // 获取文件路径
+            const originalLink = `https://telegra.ph${filePath}`;
+            const proxyLink = `https://example.com${filePath}`; // 代理链接
+            const markdownLink = `![Image](${proxyLink})`;
+            const htmlLink = `<img src="${proxyLink}" alt="Uploaded Image">`;
+
+            document.getElementById('original-link').textContent = originalLink;
+            document.getElementById('proxy-link').textContent = proxyLink;
+            document.getElementById('markdown-link').textContent = markdownLink;
+            document.getElementById('html-link').textContent = htmlLink;
+
+            resultDiv.classList.remove('hidden');
+        } else {
+            alert('上传失败，请重试。');
+        }
+        progressContainer.classList.add('hidden');
+        progressBar.style.width = '0%';
+    };
+
+    xhr.send(formData);
 }
