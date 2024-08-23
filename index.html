@@ -122,7 +122,12 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应不是 OK');
+            }
+            return response.json();
+        })
         .then(data => {
             const imageUrl = `https://telegra.ph${data[0].src}`;
             document.getElementById('image-url').textContent = imageUrl;
@@ -131,7 +136,7 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('上传失败，请重试。');
+            alert('上传失败，请重试。错误信息: ' + error.message);
         });
     });
 </script>
