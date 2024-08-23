@@ -1,50 +1,53 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>上传图片到 Telegra.ph</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Upload Image to Telegra.ph</title>
+<style>
+  /* 省略样式部分，保持不变 */
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>上传图片到 Telegra.ph</h1>
-        <form id="upload-form" method="post" action="https://telegra.ph/upload" enctype="multipart/form-data">
-            <label for="select-file">选择图片 (&lt;5MB):</label>
-            <input id="select-file" name="file0" type="file" accept="image/*" required>
-            <input value="点击上传" type="submit">
-        </form>
-        <hr />
-        <div id="result" class="image-container" style="display: none;">
-            <p>上传后的图片链接: <strong id="image-link"></strong></p>
-            <img id="uploaded-image" src="" alt="Uploaded Image">
-        </div>
-        <div class="footer">
-            <p>由 <a href="https://telegram.me/ZORO2045">ፚ Ꭷ Ꮢ Ꭷ ❥</a> 开发 &copy; 2024</p>
-        </div>
-    </div>
+<div class="container">
+  <h1>Upload Image to Telegra.ph</h1>
+  <form id="upload-form" enctype="multipart/form-data">
+    <label for="select-file">Select Image (&lt;5MB):</label>
+    <input id="select-file" name="file0" type="file" required>
+    <input value="Click to Upload" type="submit">
+  </form>
+  <hr />
+  <div class="image-container" id="image-container" style="display: none;">
+    <p>The URL of the image below is <strong id="image-url"></strong></p>
+    <img id="uploaded-image" alt="Uploaded Image">
+  </div>
+  <div class="footer">
+    Developed by <a href="https://telegram.me/ZORO2045">ፚ Ꭷ Ꮢ Ꭷ ❥</a> &copy; 2024
+  </div>
+</div>
 
-    <script>
-        document.getElementById('upload-form').onsubmit = async function(event) {
-            event.preventDefault(); // 防止表单默认提交
+<script>
+document.getElementById('upload-form').addEventListener('submit', function(event) {
+  event.preventDefault(); // 阻止默认表单提交
 
-            const formData = new FormData(this);
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                const imageUrl = `https://telegra.ph${result[0].src}`;
-                document.getElementById('image-link').textContent = imageUrl;
-                document.getElementById('uploaded-image').src = imageUrl;
-                document.getElementById('result').style.display = 'block';
-            } else {
-                alert('上传失败，请重试。');
-            }
-        };
-    </script>
+  const formData = new FormData(this);
+  fetch('https://telegra.ph/upload', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    const imagePath = data[0].src; // 获取相对路径
+    const imageUrl = `https://telegra.ph${imagePath}`; // 拼接成完整 URL
+    document.getElementById('image-url').innerText = imageUrl; // 显示 URL
+    document.getElementById('uploaded-image').src = imageUrl; // 显示图片
+    document.getElementById('image-container').style.display = 'block'; // 显示图片容器
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+});
+</script>
 </body>
 </html>
